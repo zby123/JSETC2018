@@ -13,6 +13,7 @@ import json
 import bond
 import baaz
 import shoe
+
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
 team_name = "Furret"
@@ -85,6 +86,7 @@ def main():
 	bond_obj = bond.Bond()
 
 	# bond_obj.hello()
+
 	trades = bond_obj.trade(order_obj, positions, all_trades)
 	for trade in trades:
 		all_trades[trade['order_id']] = trade
@@ -92,10 +94,10 @@ def main():
 
 
 	baaz_obj = baaz.Baaz()
-	# trades = baaz_obj.trade(book, order_obj, positions, all_trades)
-	# for trade in trades:
-	# 	all_trades[trade['order_id']] = trade
-	# 	write_to_exchange(exchange, trade)
+	trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+	for trade in trades:
+		all_trades[trade['order_id']] = trade
+		write_to_exchange(exchange, trade)
 
 	trades = baaz_obj.baba2baaz(book, order_obj, positions)
 	for trade in trades:
@@ -122,14 +124,34 @@ def main():
 		return
 
 	book_ctr = 0
+	trade_ctr = 0
+	OK_ctr = 0
 	while (1):
 		book_ctr += 1
 		if (book_ctr % 100 == 0):
-			if 'BABA' in book and 'BAAZ' in book and \
-				len(book['BABA']['sell']) > 0 and len(book['BABA']['buy']) > 0 and \
-				len(book['BAAZ']['sell']) > 0 and len(book['BAAZ']['buy']) > 0 :
-				print("BABA: ", 'sell:', book['BABA']['sell'][0][0], ' buy:', book['BABA']['buy'][0][0], ' ', end="")
-				print("BAAZ: ", 'sell:', book['BAAZ']['sell'][0][0], ' buy:', book['BAAZ']['buy'][0][0])
+			if 'SHOE' in book and 'BAAZ' in book and 'NIKE' in book and 'ADID' in book and 'FYUE' in book and 'BOND' in book and \
+					len(book['BOND']['sell']) > 0 and len(book['BOND']['buy']) > 0 and \
+					len(book['SHOE']['sell']) > 0 and len(book['SHOE']['buy']) > 0 and \
+					len(book['BAAZ']['sell']) > 0 and len(book['BAAZ']['buy']) > 0 and \
+					len(book['NIKE']['sell']) > 0 and len(book['NIKE']['buy']) > 0 and \
+					len(book['ADID']['sell']) > 0 and len(book['ADID']['buy']) > 0 and \
+					len(book['FYUE']['sell']) > 0 and len(book['FYUE']['buy']) > 0:
+				shoe_sell = 10 * book['SHOE']['sell'][0][0]
+				other_sell = 3 * book['BOND']['sell'][0][0] + 2 * book['NIKE']['sell'][0][0] + \
+										 3 * book['ADID']['sell'][0][0] + 2 * book['FYUE']['sell'][0][0]
+				shoe_buy = 10 * book['SHOE']['buy'][0][0]
+				other_buy = 3 * book['BOND']['buy'][0][0] + 2 * book['NIKE']['buy'][0][0] + \
+										3 * book['ADID']['buy'][0][0] + 2 * book['FYUE']['buy'][0][0]
+				trade_ctr += 1
+				if shoe_sell < other_buy or other_sell < shoe_buy:
+					OK_ctr += 1
+
+				# print("SHOE: ", 'sell:', 10 * book['SHOE']['sell'][0][0], ' buy:', 10 * book['SHOE']['buy'][0][0], ' ', end="")
+				# print("OTHERS: ", 'sell:', 3 * book['BOND']['sell'][0][0] + 2 * book['NIKE']['sell'][0][0] +\
+				# 			3 * book['ADID']['sell'][0][0] + 2 * book['FYUE']['sell'][0][0],
+				# 			' buy:', 3 * book['BOND']['buy'][0][0] + 2 * book['NIKE']['buy'][0][0] +\
+				# 			3 * book['ADID']['buy'][0][0] + 2 * book['FYUE']['buy'][0][0])
+				print("OK percent: ", float(OK_ctr) / trade_ctr, "OK: ", OK_ctr)
 			book_ctr = 0
 
 		reply = read_from_exchange(exchange)
@@ -139,28 +161,36 @@ def main():
 			# print(1)
 			# print("book: ", reply)
 			book[reply['symbol']] = {'buy': reply['buy'], 'sell': reply['sell']}
-			if counter % 100 == 0:
-				# trades = baaz_obj.trade(book, order_obj, positions, all_trades)
-				# for trade in trades:
-				# 	all_trades[trade['order_id']] = trade
-				# 	write_to_exchange(exchange, trade)
+			trades = baaz_obj.baba2baaz(book, order_obj, positions)
+			for trade in trades:
+				all_trades[trade['order_id']] = trade
+				write_to_exchange(exchange, trade)
 
-				trades = baaz_obj.baba2baaz(book, order_obj, positions)
-				for trade in trades:
-					all_trades[trade['order_id']] = trade
-					write_to_exchange(exchange, trade)
+			trades = baaz_obj.baaz2baba(book, order_obj, positions)
+			for trade in trades:
+				all_trades[trade['order_id']] = trade
+				write_to_exchange(exchange, trade)
 
-				trades = baaz_obj.baaz2baba(book, order_obj, positions)
-				for trade in trades:
-					all_trades[trade['order_id']] = trade
-					write_to_exchange(exchange, trade)
+			trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+			for trade in trades:
+				all_trades[trade['order_id']] = trade
+				write_to_exchange(exchange, trade)
 
+			trades = shoe_obj.shoe2other(book, order_obj, positions)
+			for trade in trades:
+				all_trades[trade['order_id']] = trade
+				write_to_exchange(exchange, trade)
 
-				trades = shoe_obj.trade(book, order_obj, positions, all_trades)
-				for trade in trades:
-					all_trades[trade['order_id']] = trade
-					write_to_exchange(exchange, trade)
-				counter = 0
+			trades = shoe_obj.other2shoe(book, order_obj, positions)
+			for trade in trades:
+				all_trades[trade['order_id']] = trade
+				write_to_exchange(exchange, trade)
+
+			trades = shoe_obj.trade(book, order_obj, positions, all_trades)
+			for trade in trades:
+				all_trades[trade['order_id']] = trade
+				write_to_exchange(exchange, trade)
+			counter = 0
 
 		elif (reply['type'] == 'fill'):
 			# print(2)
@@ -191,7 +221,7 @@ def main():
 			# print("ack", reply)
 			pass
 		elif (reply['type'] == 'reject'):
-			print("reject", reply)
+			# print("reject", reply)
 			pass
 
 if __name__ == "__main__":

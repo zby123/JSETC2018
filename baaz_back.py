@@ -75,7 +75,6 @@ class Baaz:
 					 'size': trade_size})
 		return trades
 
-
 	def trade(self, book, order_obj, position, all_trades):
 		trades = []
 		self.fv = self.fairvalue(book)
