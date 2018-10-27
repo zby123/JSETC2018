@@ -10,9 +10,17 @@ class Baaz:
 			'BAAZ' in book and 'buy' in book['BAAZ'] and 'sell' in book['BAAZ'] and \
 				len(book['BABA']['buy']) > 0 and len(book['BABA']['sell']) > 0:
 			# print("fairvalue: ", book['BABA']['buy'], book['BABA']['sell'])
-			buy = book['BABA']['buy'][0][0]
-			sell = book['BABA']['sell'][0][0]
-			return (buy + sell) / 2
+			buy = buys = 0
+            for i in range(max(3, len(book['BABA']['buy']))):
+                buy += book['BABA']['buy'][i][0] * book['BABA']['buy'][i][1]
+                buys += book['BABA']['buy'][i][1]
+
+            sell = sells = 0
+            for i in range(max(3, len(book['BABA']['sell']))):
+                buy += book['BABA']['sell'][i][0] * book['BABA']['sell'][i][1]
+                buys += book['BABA']['sell'][i][1]
+
+			return (buy + sell) / (buys + sells)
 		else:
 			return -1
 
