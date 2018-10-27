@@ -158,7 +158,7 @@ def main():
 
 		elif (reply['type'] == 'out'):
 			# print(4)
-			trades = bond_obj.trade(order_obj, all_trades)
+			trades = bond_obj.trade(order_obj, positions, all_trades)
 			for trade in trades:
 				all_trades[trade['order_id']] = trade
 				write_to_exchange(exchange, trade)
