@@ -12,7 +12,7 @@ import socket
 import json
 import bond
 import baaz
-
+import shoe
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
 team_name = "Furret"
@@ -80,7 +80,7 @@ def main():
 
 	for item in hello_from_exchange["symbols"]:
 		positions[item['symbol']] = item['position']
-	print(positions)
+	# print(positions)
 
 	bond_obj = bond.Bond()
 
@@ -96,13 +96,28 @@ def main():
 		all_trades[trade['order_id']] = trade
 		write_to_exchange(exchange, trade)
 
+	shoe_obj = shoe.Shoe()
+	trades = shoe_obj.trade(book, order_obj, positions, all_trades)
+	for trade in trades:
+		all_trades[trade['order_id']] = trade
+		write_to_exchange(exchange, trade)
+
 	counter = 0
 
 	reply = read_from_exchange(exchange)
 	if(reply['type'] == 'reject'):
 		return
 
+	book_ctr = 0
 	while (1):
+		book_ctr += 1
+		if (book_ctr % 100 == 0):
+			if 'BABA' in book and 'BAAZ' in book and \
+				len(book['BABA']) > 0 and len(book['BAAZ']) > 0:
+				print("BABA: ", 'sell:', book['BABA']['sell'][0][0], ' buy:', book['BABA']['buy'][0][0], ' ', end="")
+				print("BAAZ: ", 'sell:', book['BAAZ']['sell'][0][0], ' buy:', book['BAAZ']['buy'][0][0])
+			book_ctr = 0
+
 		reply = read_from_exchange(exchange)
 
 		if (reply['type'] == 'book'):
@@ -112,6 +127,11 @@ def main():
 			book[reply['symbol']] = {'buy': reply['buy'], 'sell': reply['sell']}
 			if counter % 100 == 0:
 				trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+				for trade in trades:
+					all_trades[trade['order_id']] = trade
+					write_to_exchange(exchange, trade)
+
+				trades = shoe_obj.trade(book, order_obj, positions, all_trades)
 				for trade in trades:
 					all_trades[trade['order_id']] = trade
 					write_to_exchange(exchange, trade)
@@ -143,9 +163,11 @@ def main():
 				write_to_exchange(exchange, trade)
 
 		elif (reply['type'] == 'ack'):
-			print("ack", reply)
+			# print("ack", reply)
+			pass
 		elif (reply['type'] == 'reject'):
-			print("reject", reply)
+			# print("reject", reply)
+			pass
 
 if __name__ == "__main__":
 	main()

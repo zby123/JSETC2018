@@ -1,4 +1,4 @@
-class Baaz:
+class Shoe:
 
 	def __init__(self):
 		self.fv = 0
@@ -11,9 +11,9 @@ class Baaz:
 		'ADID' in book and 'buy' in book['ADID'] and 'sell' in book['ADID'] and \
 		'FYUE' in book and 'buy' in book['FYUE'] and 'sell' in book['FYUE'] and \
 			'SHOE' in book and 'buy' in book['SHOE'] and 'sell' in book['SHOE'] and \
-				len(book['BOND']['buy']) > 0 and len(book['BOND']['sell']) > 0\
-				len(book['NIKE']['buy']) > 0 and len(book['NIKE']['sell']) > 0\
-				len(book['ADID']['buy']) > 0 and len(book['ADID']['sell']) > 0\
+				len(book['BOND']['buy']) > 0 and len(book['BOND']['sell']) > 0 and \
+				len(book['NIKE']['buy']) > 0 and len(book['NIKE']['sell']) > 0 and \
+				len(book['ADID']['buy']) > 0 and len(book['ADID']['sell']) > 0 and \
 				len(book['FYUE']['buy']) > 0 and len(book['FYUE']['sell']) > 0:
 			# print("fairvalue: ", book['SHOE']['buy'], book['SHOE']['sell'])
 			buy = book['BOND']['buy'][0][0] * 3 + book['NIKE']['buy'][0][0] * 2 + book['ADID']['buy'][0][0] * 3 + book['FYUE']['buy'][0][0] * 2
