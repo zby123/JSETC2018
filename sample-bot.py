@@ -18,7 +18,7 @@ import baaz
 team_name = "Furret"
 # This variable dictates whether or not the bot is connecting to the prod
 # or test exchange. Be careful with this switch!
-test_mode = True
+test_mode = False
 
 # This setting changes which test exchange is connected to.
 # 0 is prod-like
@@ -77,7 +77,10 @@ def main():
 	print("The exchange replied:", hello_from_exchange, file=sys.stderr)
 	print(type(hello_from_exchange))
 	print(hello_from_exchange.keys())
-	positions = hello_from_exchange["symbols"]
+
+	for item in hello_from_exchange["symbols"]:
+		positions[item['symbol']] = item['position']
+	print(positions)
 
 	bond_obj = bond.Bond()
 
@@ -93,17 +96,29 @@ def main():
 		all_trades[trade['order_id']] = trade
 		write_to_exchange(exchange, trade)
 
+	counter = 0
+
+	reply = read_from_exchange(exchange)
+	if(reply['type'] == 'reject'):
+		return
+
 	while (1):
 		reply = read_from_exchange(exchange)
+
 		if (reply['type'] == 'book'):
+			counter += 1
+			# print(1)
 			# print("book: ", reply)
 			book[reply['symbol']] = {'buy': reply['buy'], 'sell': reply['sell']}
-			trades = bond_obj.trade(order_obj, all_trades)
-			for trade in trades:
-				all_trades[trade['order_id']] = trade
-				write_to_exchange(exchange, trade)
+			if counter % 100 == 0:
+				trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+				for trade in trades:
+					all_trades[trade['order_id']] = trade
+					write_to_exchange(exchange, trade)
+				counter = 0
 
-		if (reply['type'] == 'fill'):
+		elif (reply['type'] == 'fill'):
+			# print(2)
 			if (reply['dir'] == 'buy'):
 				positions[reply['symbol']] += reply['size']
 				cash -= reply['size'] * reply['price']
@@ -112,6 +127,7 @@ def main():
 					all_trades.pop(reply['order_id'])
 
 			elif (reply['dir'] == 'sell'):
+				# print(3)
 				positions[reply['symbol']] -= reply['size']
 				cash += reply['size'] * reply['price']
 				all_trades[reply['order_id']] -= reply['size']
@@ -119,12 +135,17 @@ def main():
 					all_trades.pop(reply['order_id'])
 			print("log, fill-reply received: ", reply)
 
-		if (reply['type'] == 'out'):
+		elif (reply['type'] == 'out'):
+			# print(4)
 			trades = bond_obj.trade(order_obj, all_trades)
 			for trade in trades:
 				all_trades[trade['order_id']] = trade
 				write_to_exchange(exchange, trade)
 
+		elif (reply['type'] == 'ack'):
+			print("ack", reply)
+		elif (reply['type'] == 'reject'):
+			print("reject", reply)
 
 if __name__ == "__main__":
 	main()
