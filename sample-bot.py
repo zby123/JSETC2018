@@ -74,9 +74,9 @@ def main():
 	all_trades = {}
 	order_obj = Order()
 
-	print("The exchange replied:", hello_from_exchange, file=sys.stderr)
-	print(type(hello_from_exchange))
-	print(hello_from_exchange.keys())
+	# print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+	# print(type(hello_from_exchange))
+	# print(hello_from_exchange.keys())
 
 	for item in hello_from_exchange["symbols"]:
 		positions[item['symbol']] = item['position']
@@ -113,7 +113,8 @@ def main():
 		book_ctr += 1
 		if (book_ctr % 100 == 0):
 			if 'BABA' in book and 'BAAZ' in book and \
-				len(book['BABA']) > 0 and len(book['BAAZ']) > 0:
+				len(book['BABA']['sell']) > 0 and len(book['BABA']['buy']) > 0 and \
+				len(book['BAAZ']['sell']) > 0 and len(book['BAAZ']['buy']) > 0 :
 				print("BABA: ", 'sell:', book['BABA']['sell'][0][0], ' buy:', book['BABA']['buy'][0][0], ' ', end="")
 				print("BAAZ: ", 'sell:', book['BAAZ']['sell'][0][0], ' buy:', book['BAAZ']['buy'][0][0])
 			book_ctr = 0
@@ -153,7 +154,7 @@ def main():
 				all_trades[reply['order_id']] -= reply['size']
 				if (all_trades[reply['order_id']] == 0):
 					all_trades.pop(reply['order_id'])
-			print("log, fill-reply received: ", reply)
+			# print("log, fill-reply received: ", reply)
 
 		elif (reply['type'] == 'out'):
 			# print(4)

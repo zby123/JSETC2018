@@ -26,24 +26,24 @@ class Shoe:
 		trades = []
 		self.fv = self.fairvalue(book)
 		if self.fv == -1:
-			print("no SHOE in book")
+			# print("no SHOE in book")
 			return trades
 
-		print("try to order")
+		# print("try to order")
 		buy_list = book['SHOE']['buy']
 		sell_list = book['SHOE']['sell']
 
 		index = 0
 		trade_size = 0
 
-		print("SHOE debug: ", index, buy_list, position['SHOE'], self.fv)
+		# print("SHOE debug: ", index, buy_list, position['SHOE'], self.fv)
 		while index < len(buy_list) and position['SHOE'] > self.SHOE_MIN and buy_list[index][0] > self.fv:
 			if position['SHOE'] - self.SHOE_MIN < buy_list[index][1]:
 				trade_size = position['SHOE'] - self.SHOE_MIN
 			else:
 				trade_size = buy_list[index][1]
 			trades.append({'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'SHOE', 'dir': 'SELL', 'price': buy_list[index][0],'size': trade_size})
-			print("trades: ", trades)
+			# print("trades: ", trades)
 			index += 1
 
 		index = 0
