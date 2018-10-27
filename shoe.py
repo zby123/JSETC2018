@@ -16,8 +16,44 @@ class Shoe:
 				len(book['ADID']['buy']) > 0 and len(book['ADID']['sell']) > 0 and \
 				len(book['FYUE']['buy']) > 0 and len(book['FYUE']['sell']) > 0:
 			# print("fairvalue: ", book['SHOE']['buy'], book['SHOE']['sell'])
-			buy = book['BOND']['buy'][0][0] * 3 + book['NIKE']['buy'][0][0] * 2 + book['ADID']['buy'][0][0] * 3 + book['FYUE']['buy'][0][0] * 2
-			sell = book['BOND']['sell'][0][0] * 3 + book['NIKE']['sell'][0][0] * 2 + book['ADID']['sell'][0][0] * 3 + book['FYUE']['buy'][0][0] * 2
+			buy = 3000
+			tbuy = tbuys = 0
+			for i in range(min(3, len(book['NIKE']['buy']))):
+				tbuy += book['NIKE']['buy'][0][0] * 2 * book['NIKE']['buy'][0][1]
+				tbuys += book['NIKE']['buy'][0][1]
+			buy += tbuy / tbuys
+
+			tbuy = tbuys = 0
+			for i in range(min(3, len(book['ADID']['buy']))):
+				tbuy += book['ADID']['buy'][0][0] * 3 * book['ADID']['buy'][0][1]
+				tbuys += book['ADID']['buy'][0][1]
+			buy += tbuy / tbuys
+
+			tbuy = tbuys = 0
+			for i in range(min(3, len(book['FYUE']['buy']))):
+				tbuy += book['FYUE']['buy'][0][0] * 2 * book['FYUE']['buy'][0][1]
+				tbuys += book['FYUE']['buy'][0][1]
+			buy += tbuy / tbuys
+
+			sell = 3000
+			tsell = tsells = 0
+			for i in range(min(3, len(book['NIKE']['sell']))):
+				tsell += book['NIKE']['sell'][0][0] * 2 * book['NIKE']['sell'][0][1]
+				tsells += book['NIKE']['sell'][0][1]
+			sell += tsell / tsells
+
+			tsell = tsells = 0
+			for i in range(min(3, len(book['ADID']['sell']))):
+				tsell += book['ADID']['sell'][0][0] * 3 * book['ADID']['sell'][0][1]
+				tsells += book['ADID']['sell'][0][1]
+			sell += tsell / tsells
+
+			tsell = tsells = 0
+			for i in range(min(3, len(book['FYUE']['sell']))):
+				tsell += book['FYUE']['sell'][0][0] * 2 * book['FYUE']['sell'][0][1]
+				tsells += book['FYUE']['sell'][0][1]
+			sell += tsell / tsells
+			
 			return (buy + sell) / 20
 		else:
 			return -1
