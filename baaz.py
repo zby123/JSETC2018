@@ -47,22 +47,28 @@ class Baaz:
 				trade_size = tpos - self.BAAZ_MIN
 			else:
 				trade_size = buy_list[index][1]
-			trades.append({'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'SELL', 'price': buy_list[index][0],'size': trade_size})
+			trades.append(
+				{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'SELL', 'price': buy_list[index][0],
+				 'size': trade_size})
 			tpos -= trade_size
 			# print("trades: ", trades)
 			index += 1
 
-			baba_pos = position['BABA']
-			while index < len(buy_list) and baba_pos > self.BABA_MIN and buy_list[index][0] - (buy_list[index][1] / 10) > self.fv:
-					if baba_pos - self.BABA_MIN < buy_list[index][1]:
-							trade_size = baba_pos - self.BABA_MIN
-					else:
-							trade_size = buy_list[index][1]
-					trades.append({'type' : 'convert', 'order_id' : order_obj.getOrder(), 'symbol' : 'BAAZ', 'dir' : 'BUY', 'size' : trade_size})
-					trades.append({'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'SELL', 'price': buy_list[index][0],'size': trade_size})
-					babapos -= trade_size
-					print("trades: ", trades)
-					index += 1
+		baba_pos = position['BABA']
+		while index < len(buy_list) and baba_pos > self.BABA_MIN and buy_list[index][0] - (
+				buy_list[index][1] / 10) > self.fv:
+			if baba_pos - self.BABA_MIN < buy_list[index][1]:
+				trade_size = baba_pos - self.BABA_MIN
+			else:
+				trade_size = buy_list[index][1]
+			trades.append(
+				{'type': 'convert', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'size': trade_size})
+			trades.append(
+				{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'SELL', 'price': buy_list[index][0],
+				 'size': trade_size})
+			baba_pos -= trade_size
+			print("trades: ", trades)
+			index += 1
 
 		index = 0
 		while index < len(sell_list) and position['BAAZ'] < self.BAAZ_MAX and sell_list[index][0] < self.fv:
@@ -71,20 +77,26 @@ class Baaz:
 			else:
 				trade_size = sell_list[index][1]
 
-			trades.append({'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'price': sell_list[index][0], 'size': trade_size})
+			trades.append(
+				{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'price': sell_list[index][0],
+				 'size': trade_size})
 			tpos += trade_size
 			index += 1
 
-			while index < len(buy_list) and baba_pos < self.BABA_MAX and sell_list[index][0] + (sell_list[index][1] / 10) > self.fv:
-					if self.BABA_MAX - baba_pos < sell_list[index][1]:
-							trade_size =  self.BABA_MAX - baba_pos
-					else:
-							trade_size = buy_list[index][1]
-					trades.append({'type' : 'convert', 'order_id' : order_obj.getOrder(), 'symbol' : 'BAAZ', 'dir' : 'SELL', 'size' : trade_size})
-					trades.append({'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'price': sell_list[index][0],'size': trade_size})
-					baba_pos += trade_size
-					print("trades: ", trades)
-					index += 1
+		while index < len(sell_list) and baba_pos < self.BABA_MAX and sell_list[index][0] + (
+				sell_list[index][1] / 10) > self.fv:
+			if self.BABA_MAX - baba_pos < sell_list[index][1]:
+				trade_size = self.BABA_MAX - baba_pos
+			else:
+				trade_size = sell_list[index][1]
+			trades.append(
+				{'type': 'convert', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'SELL', 'size': trade_size})
+			trades.append(
+				{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'price': sell_list[index][0],
+				 'size': trade_size})
+			baba_pos += trade_size
+			print("trades: ", trades)
+			index += 1
 
 		# for trade in trades:
 		# 	all_trades[trade['order_id']] = trade
