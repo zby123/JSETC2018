@@ -127,7 +127,7 @@ def main():
 	trade_ctr = 0
 	OK_ctr = 0
 	while (1):
-		book_ctr += 1
+		# book_ctr += 1
 		if (book_ctr % 100 == 0):
 			if 'SHOE' in book and 'BAAZ' in book and 'NIKE' in book and 'ADID' in book and 'FYUE' in book and 'BOND' in book and \
 					len(book['BOND']['sell']) > 0 and len(book['BOND']['buy']) > 0 and \
@@ -142,22 +142,25 @@ def main():
 				shoe_buy = 10 * book['SHOE']['buy'][0][0]
 				other_buy = 3 * book['BOND']['buy'][0][0] + 2 * book['NIKE']['buy'][0][0] + \
 										3 * book['ADID']['buy'][0][0] + 2 * book['FYUE']['buy'][0][0]
-				trade_ctr += 1
-				if shoe_sell < other_buy or other_sell < shoe_buy:
-					OK_ctr += 1
+				# trade_ctr += 1
+				# if shoe_sell < other_buy or other_sell < shoe_buy:
+				# 	OK_ctr += 1
 
 				# print("SHOE: ", 'sell:', 10 * book['SHOE']['sell'][0][0], ' buy:', 10 * book['SHOE']['buy'][0][0], ' ', end="")
 				# print("OTHERS: ", 'sell:', 3 * book['BOND']['sell'][0][0] + 2 * book['NIKE']['sell'][0][0] +\
 				# 			3 * book['ADID']['sell'][0][0] + 2 * book['FYUE']['sell'][0][0],
 				# 			' buy:', 3 * book['BOND']['buy'][0][0] + 2 * book['NIKE']['buy'][0][0] +\
 				# 			3 * book['ADID']['buy'][0][0] + 2 * book['FYUE']['buy'][0][0])
-				print("OK percent: ", float(OK_ctr) / trade_ctr, "OK: ", OK_ctr)
+				# print("OK percent: ", float(OK_ctr) / trade_ctr, "OK: ", OK_ctr)
 			book_ctr = 0
 
 		reply = read_from_exchange(exchange)
 
 		if (reply['type'] == 'book'):
 			counter += 1
+			if counter % 100 == 0:
+				print("im running ", counter)
+				counter = 0
 			# print(1)
 			# print("book: ", reply)
 			book[reply['symbol']] = {'buy': reply['buy'], 'sell': reply['sell']}
@@ -190,7 +193,6 @@ def main():
 			for trade in trades:
 				all_trades[trade['order_id']] = trade
 				write_to_exchange(exchange, trade)
-			counter = 0
 
 		elif (reply['type'] == 'fill'):
 			# print(2)

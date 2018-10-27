@@ -1,5 +1,4 @@
 class Baaz:
-
 	def __init__(self):
 		self.fv = 0
 		self.BAAZ_MAX = 10
@@ -38,9 +37,9 @@ class Baaz:
 			trade_size = min(baaz_sell_list[0][1], self.BAAZ_MAX - position['BAAZ'], baba_buy_list[0][1],
 											 self.BABA_MAX - position['BABA'])
 
-			print('out trade size ', trade_size)
+			# print('out trade size ', trade_size)
 			if (baaz_sell_price * trade_size + self.CONVERT_COST < baba_buy_price * trade_size):
-				print('in trade size ', trade_size)
+				# print('in trade size ', trade_size)
 				trades.append(
 					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'price': baaz_sell_price,
 					 'size': trade_size})
@@ -62,9 +61,9 @@ class Baaz:
 			trade_size = min(baba_sell_list[0][1], self.BABA_MAX - position['BABA'], baaz_buy_list[0][1],
 											 self.BAAZ_MAX - position['BAAZ'])
 
-			print('out trade size ', trade_size)
+			# print('out trade size ', trade_size)
 			if (baba_sell_price * trade_size + self.CONVERT_COST < baaz_buy_price * trade_size):
-				print('in trade size ', trade_size)
+				# print('in trade size ', trade_size)
 				trades.append(
 					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BABA', 'dir': 'BUY', 'price': baba_sell_price,
 					 'size': trade_size})
@@ -89,7 +88,6 @@ class Baaz:
 
 		index = 0
 		trade_size = 0
-
 		# print("BABA debug: ", index, buy_list, position['BAAZ'], self.fv)
 		while index < len(buy_list) and position['BAAZ'] > self.BAAZ_MIN and buy_list[index][0] > self.fv:
 			if position['BAAZ'] - self.BAAZ_MIN < buy_list[index][1]:

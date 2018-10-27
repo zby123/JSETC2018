@@ -123,10 +123,10 @@ class Shoe:
 			trade_size = min(book['SHOE']['sell'][0][1] / 10, (self.BOND_MAX - position['BOND']) / 3,
 											 (self.NIKE_MAX - position['NIKE']) / 2, (self.ADID_MAX - position['ADID']) / 3,
 											 (self.FYUE_MAX - position['FYUE']) / 2)
-			print('out trade size ', trade_size)
+			# print('out trade size ', trade_size)
 			if shoe_sell_price * 10 * trade_size + self.CONVERT_COST < (3 * (bond_buy_price - 1) + 2 * (nike_buy_price - 1) + 3 * (adid_buy_price - 1) +  \
 				2 * (fyue_buy_price - 1)) * trade_size:
-				print('in trade size ', trade_size)
+				# print('in trade size ', trade_size)
 				trades.append(
 					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'SHOE', 'dir': 'BUY', 'price': shoe_sell_price,
 					 'size': trade_size * 10})
@@ -166,10 +166,10 @@ class Shoe:
 											 book['NIKE']['sell'][0][1] / 2, book['ADID']['sell'][0][1] / 3,
 											 book['FYUE']['sell'][0][1] / 2)
 
-			print('out trade size ', trade_size)
+			# print('out trade size ', trade_size)
 			if (shoe_buy_price - 1) * 10 * trade_size > (3 * bond_sell_price + 2 * nike_sell_price + 3 * adid_sell_price +  \
 				2 * fyue_sell_price) * trade_size + self.CONVERT_COST:
-				print('in trade size ', trade_size)
+				# print('in trade size ', trade_size)
 				trades.append(
 					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BOND', 'dir': 'BUY', 'price': bond_sell_price,
 					 'size': trade_size * 3})
