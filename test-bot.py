@@ -12,13 +12,13 @@ import socket
 import json
 import bond
 import baaz
-
+import shoe
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
 team_name = "Furret"
 # This variable dictates whether or not the bot is connecting to the prod
 # or test exchange. Be careful with this switch!
-test_mode = True
+test_mode = False
 
 # This setting changes which test exchange is connected to.
 # 0 is prod-like
@@ -74,18 +74,22 @@ def main():
 	all_trades = {}
 	order_obj = Order()
 
-	print("The exchange replied:", hello_from_exchange, file=sys.stderr)
-	print(type(hello_from_exchange))
-	print(hello_from_exchange.keys())
-	positions = hello_from_exchange["symbols"]
+	# print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+	# print(type(hello_from_exchange))
+	# print(hello_from_exchange.keys())
+
+	for item in hello_from_exchange["symbols"]:
+		positions[item['symbol']] = item['position']
+	# print(positions)
 
 	bond_obj = bond.Bond()
 
 	# bond_obj.hello()
-	trades = bond_obj.trade(order_obj, all_trades)
+	trades = bond_obj.trade(order_obj, positions, all_trades)
 	for trade in trades:
 		all_trades[trade['order_id']] = trade
 		write_to_exchange(exchange, trade)
+
 
 	baaz_obj = baaz.Baaz()
 	trades = baaz_obj.trade(book, order_obj, positions, all_trades)
@@ -93,13 +97,73 @@ def main():
 		all_trades[trade['order_id']] = trade
 		write_to_exchange(exchange, trade)
 
+	# trades = baaz_obj.baba2baaz(book, order_obj, positions)
+	# for trade in trades:
+	# 	all_trades[trade['order_id']] = trade
+	# 	write_to_exchange(exchange, trade)
+	#
+	# trades = baaz_obj.baaz2baba(book, order_obj, positions)
+	# for trade in trades:
+	# 	all_trades[trade['order_id']] = trade
+	# 	write_to_exchange(exchange, trade)
+
+	shoe_obj = shoe.Shoe()
+	trades = shoe_obj.trade(book, order_obj, positions, all_trades)
+	for trade in trades:
+		all_trades[trade['order_id']] = trade
+		write_to_exchange(exchange, trade)
+
+
+
+	counter = 0
+
+	reply = read_from_exchange(exchange)
+	if(reply['type'] == 'reject'):
+		return
+
+	book_ctr = 0
 	while (1):
+		book_ctr += 1
+		if (book_ctr % 100 == 0):
+			if 'BABA' in book and 'BAAZ' in book and \
+				len(book['BABA']['sell']) > 0 and len(book['BABA']['buy']) > 0 and \
+				len(book['BAAZ']['sell']) > 0 and len(book['BAAZ']['buy']) > 0 :
+				print("BABA: ", 'sell:', book['BABA']['sell'][0][0], ' buy:', book['BABA']['buy'][0][0], ' ', end="")
+				print("BAAZ: ", 'sell:', book['BAAZ']['sell'][0][0], ' buy:', book['BAAZ']['buy'][0][0])
+			book_ctr = 0
+
 		reply = read_from_exchange(exchange)
+
 		if (reply['type'] == 'book'):
+			counter += 1
+			# print(1)
 			# print("book: ", reply)
 			book[reply['symbol']] = {'buy': reply['buy'], 'sell': reply['sell']}
+			if counter % 100 == 0:
+				trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+				for trade in trades:
+					all_trades[trade['order_id']] = trade
+					write_to_exchange(exchange, trade)
 
-		if (reply['type'] == 'fill'):
+				# trades = baaz_obj.baba2baaz(book, order_obj, positions)
+				# for trade in trades:
+				# 	all_trades[trade['order_id']] = trade
+				# 	write_to_exchange(exchange, trade)
+				#
+				# trades = baaz_obj.baaz2baba(book, order_obj, positions)
+				# for trade in trades:
+				# 	all_trades[trade['order_id']] = trade
+				# 	write_to_exchange(exchange, trade)
+
+
+				trades = shoe_obj.trade(book, order_obj, positions, all_trades)
+				for trade in trades:
+					all_trades[trade['order_id']] = trade
+					write_to_exchange(exchange, trade)
+				counter = 0
+
+		elif (reply['type'] == 'fill'):
+			# print(2)
 			if (reply['dir'] == 'buy'):
 				positions[reply['symbol']] += reply['size']
 				cash -= reply['size'] * reply['price']
@@ -108,18 +172,27 @@ def main():
 					all_trades.pop(reply['order_id'])
 
 			elif (reply['dir'] == 'sell'):
+				# print(3)
 				positions[reply['symbol']] -= reply['size']
 				cash += reply['size'] * reply['price']
 				all_trades[reply['order_id']] -= reply['size']
 				if (all_trades[reply['order_id']] == 0):
 					all_trades.pop(reply['order_id'])
-			print("log, fill-reply received: ", reply)
+			# print("log, fill-reply received: ", reply)
 
-		if (reply['type'] == 'out'):
-			trades = bond_obj.trade(order_obj, all_trades)
+		elif (reply['type'] == 'out'):
+			# print(4)
+			trades = bond_obj.trade(order_obj, positions, all_trades)
 			for trade in trades:
 				all_trades[trade['order_id']] = trade
 				write_to_exchange(exchange, trade)
+
+		elif (reply['type'] == 'ack'):
+			# print("ack", reply)
+			pass
+		elif (reply['type'] == 'reject'):
+			# print("reject", reply)
+			pass
 
 if __name__ == "__main__":
 	main()

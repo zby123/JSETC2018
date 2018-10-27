@@ -6,6 +6,7 @@ class Baaz:
 		self.BAAZ_MIN = -10
 		self.BABA_MAX = 10
 		self.BABA_MIN = -10
+		self.CONVERT_COST = 10
 
 	def fairvalue(self, book):
 		if 'BABA' in book and 'buy' in book['BABA'] and 'sell' in book['BABA'] and \
@@ -25,6 +26,54 @@ class Baaz:
 			return (buy + sell) / (buys + sells)
 		else:
 			return -1
+
+	def baaz2baba(self, book, order_obj, position):
+		trades = []
+		if 'BAAZ' in book and 'sell' in book['BAAZ'] and len(book['BAAZ']['sell']) > 0 and \
+				'BABA' in book and 'buy' in book['BABA'] and len(book['BABA']['buy']) > 0:
+			baaz_sell_list = book['BAAZ']['sell']
+			baba_buy_list = book['BABA']['buy']
+			baaz_sell_price = baaz_sell_list[0][0]
+			baba_buy_price = baba_buy_list[0][0]
+			trade_size = min(baaz_sell_list[0][1], self.BAAZ_MAX - position['BAAZ'], baba_buy_list[0][1],
+											 self.BABA_MAX - position['BABA'])
+
+			print('out trade size ', trade_size)
+			if (baaz_sell_price * trade_size + self.CONVERT_COST < baba_buy_price * trade_size):
+				print('in trade size ', trade_size)
+				trades.append(
+					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'price': baaz_sell_price,
+					 'size': trade_size})
+				trades.append(
+					{'type': 'convert', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'SELL', 'size': trade_size})
+				trades.append(
+					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BABA', 'dir': 'SELL', 'price': baba_buy_price,
+					 'size': trade_size})
+		return trades
+
+	def baba2baaz(self, book, order_obj, position):
+		trades = []
+		if 'BABA' in book and 'sell' in book['BABA'] and len(book['BABA']['sell']) > 0 and \
+				'BAAZ' in book and 'buy' in book['BAAZ'] and len(book['BAAZ']['buy']) > 0:
+			baba_sell_list = book['BABA']['sell']
+			baaz_buy_list = book['BAAZ']['buy']
+			baba_sell_price = baba_sell_list[0][0]
+			baaz_buy_price = baaz_buy_list[0][0]
+			trade_size = min(baba_sell_list[0][1], self.BABA_MAX - position['BABA'], baaz_buy_list[0][1],
+											 self.BAAZ_MAX - position['BAAZ'])
+
+			print('out trade size ', trade_size)
+			if (baba_sell_price * trade_size + self.CONVERT_COST < baaz_buy_price * trade_size):
+				print('in trade size ', trade_size)
+				trades.append(
+					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BABA', 'dir': 'BUY', 'price': baba_sell_price,
+					 'size': trade_size})
+				trades.append(
+					{'type': 'convert', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'BUY', 'size': trade_size})
+				trades.append(
+					{'type': 'add', 'order_id': order_obj.getOrder(), 'symbol': 'BAAZ', 'dir': 'SELL', 'price': baaz_buy_price,
+					 'size': trade_size})
+		return trades
 
 	def trade(self, book, order_obj, position, all_trades):
 		trades = []

@@ -85,13 +85,24 @@ def main():
 	bond_obj = bond.Bond()
 
 	# bond_obj.hello()
-	trades = bond_obj.trade(order_obj, all_trades)
+	trades = bond_obj.trade(order_obj, positions, all_trades)
 	for trade in trades:
 		all_trades[trade['order_id']] = trade
 		write_to_exchange(exchange, trade)
 
+
 	baaz_obj = baaz.Baaz()
-	trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+	# trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+	# for trade in trades:
+	# 	all_trades[trade['order_id']] = trade
+	# 	write_to_exchange(exchange, trade)
+
+	trades = baaz_obj.baba2baaz(book, order_obj, positions)
+	for trade in trades:
+		all_trades[trade['order_id']] = trade
+		write_to_exchange(exchange, trade)
+
+	trades = baaz_obj.baaz2baba(book, order_obj, positions)
 	for trade in trades:
 		all_trades[trade['order_id']] = trade
 		write_to_exchange(exchange, trade)
@@ -101,6 +112,8 @@ def main():
 	for trade in trades:
 		all_trades[trade['order_id']] = trade
 		write_to_exchange(exchange, trade)
+
+
 
 	counter = 0
 
@@ -127,10 +140,21 @@ def main():
 			# print("book: ", reply)
 			book[reply['symbol']] = {'buy': reply['buy'], 'sell': reply['sell']}
 			if counter % 100 == 0:
-				trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+				# trades = baaz_obj.trade(book, order_obj, positions, all_trades)
+				# for trade in trades:
+				# 	all_trades[trade['order_id']] = trade
+				# 	write_to_exchange(exchange, trade)
+
+				trades = baaz_obj.baba2baaz(book, order_obj, positions)
 				for trade in trades:
 					all_trades[trade['order_id']] = trade
 					write_to_exchange(exchange, trade)
+
+				trades = baaz_obj.baaz2baba(book, order_obj, positions)
+				for trade in trades:
+					all_trades[trade['order_id']] = trade
+					write_to_exchange(exchange, trade)
+
 
 				trades = shoe_obj.trade(book, order_obj, positions, all_trades)
 				for trade in trades:
@@ -167,7 +191,7 @@ def main():
 			# print("ack", reply)
 			pass
 		elif (reply['type'] == 'reject'):
-			# print("reject", reply)
+			print("reject", reply)
 			pass
 
 if __name__ == "__main__":
